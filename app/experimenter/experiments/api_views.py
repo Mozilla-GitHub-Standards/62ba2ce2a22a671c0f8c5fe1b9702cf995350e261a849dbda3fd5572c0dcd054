@@ -2,7 +2,10 @@ from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 
 from experimenter.experiments.models import Experiment, ExperimentChangeLog
-from experimenter.experiments.serializers import ExperimentSerializer
+from experimenter.experiments.serializers import (
+    ExperimentSerializer,
+    ExperimentRecipeSerializer,
+)
 
 
 class ExperimentListView(ListAPIView):
@@ -15,6 +18,12 @@ class ExperimentDetailView(RetrieveAPIView):
     lookup_field = "slug"
     queryset = Experiment.objects.all()
     serializer_class = ExperimentSerializer
+
+
+class ExperimentRecipeView(RetrieveAPIView):
+    lookup_field = "slug"
+    queryset = Experiment.objects.all()
+    serializer_class = ExperimentRecipeSerializer
 
 
 class ExperimentAcceptView(UpdateAPIView):

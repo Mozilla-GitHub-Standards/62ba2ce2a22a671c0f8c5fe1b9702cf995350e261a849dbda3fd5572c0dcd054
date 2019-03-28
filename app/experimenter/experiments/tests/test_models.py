@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.conf import settings
 from django.test import TestCase
@@ -10,6 +11,7 @@ from experimenter.experiments.models import (
     ExperimentVariant,
     ExperimentChangeLog,
 )
+from experimenter.experiments.serializers import ExperimentRecipeSerializer
 from experimenter.experiments.tests.factories import (
     ExperimentFactory,
     ExperimentChangeLogFactory,
@@ -88,7 +90,7 @@ class TestExperimentModel(TestCase):
 
     def test_bugzilla_url_returns_none_if_bugzilla_id_not_set(self):
         experiment = ExperimentFactory.create_with_status(
-            Experiment.STATUS_DRAFT
+            Experiment.STATUS_DRAFT, bugzilla_id=None
         )
         self.assertIsNone(experiment.bugzilla_url)
 
@@ -139,7 +141,9 @@ class TestExperimentModel(TestCase):
 
     def test_has_external_urls_is_false_when_no_external_urls(self):
         experiment = ExperimentFactory.create(
-            data_science_bugzilla_url="", feature_bugzilla_url=""
+            bugzilla_id="",
+            data_science_bugzilla_url="",
+            feature_bugzilla_url="",
         )
         self.assertFalse(experiment.has_external_urls)
 
@@ -261,6 +265,16 @@ class TestExperimentModel(TestCase):
         normandy_slug = experiment.generate_normandy_slug()
 
         self.assertEqual(len(normandy_slug), settings.NORMANDY_SLUG_MAX_LEN)
+
+    def test_normandy_recipe_json_serializes_pref_study(self):
+        self.maxDiff = None
+        experiment = ExperimentFactory.create_with_status(
+            Experiment.STATUS_SHIP
+        )
+        recipe_json = json.loads(experiment.normandy_recipe_json)
+        self.assertEqual(
+            recipe_json, ExperimentRecipeSerializer(experiment).data
+        )
 
     def test_start_date_returns_proposed_start_date_if_change_is_missing(self):
         experiment = ExperimentFactory.create_with_variants()

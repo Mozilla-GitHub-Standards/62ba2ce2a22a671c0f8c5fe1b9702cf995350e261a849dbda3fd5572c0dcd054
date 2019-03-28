@@ -4,6 +4,7 @@ from experimenter.experiments.api_views import (
     ExperimentAcceptView,
     ExperimentDetailView,
     ExperimentListView,
+    ExperimentRecipeView,
     ExperimentRejectView,
 )
 
@@ -18,6 +19,11 @@ urlpatterns = [
         r"^(?P<slug>[\w-]+)/reject/$",
         ExperimentRejectView.as_view(),
         name="experiments-api-reject",
+    ),
+    url(
+        r"^(?P<slug>[\w-]+)/recipe/$",
+        ExperimentRecipeView.as_view(),
+        name="experiments-api-recipe",
     ),
     url(
         r"^(?P<slug>[\w-]+)/$",
